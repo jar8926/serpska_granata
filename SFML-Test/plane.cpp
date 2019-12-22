@@ -1,5 +1,4 @@
 #include "plane.h"
-const int W = 640;
 	plane::plane()
 	{
 		dx = rand() % 2 + 4;

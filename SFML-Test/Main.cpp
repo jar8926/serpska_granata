@@ -7,8 +7,6 @@
 #include "player.h"
 using namespace sf;
 
-const int W = 640;
-const int H = 480;
 
 
 void menu(RenderWindow & window) {

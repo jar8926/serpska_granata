@@ -4,11 +4,13 @@
 #include "windows.h"
 #include <list>
 using namespace sf;
+
+const int W = 640;
+const int H = 480;
 class Animation
 {
 public:
-	const int W = 640;
-	const int H = 480;
+
 	float Frame, speed;
 	Sprite sprite;
 	std::vector<IntRect> frames;
