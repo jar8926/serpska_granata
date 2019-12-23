@@ -1,5 +1,7 @@
 #include <SFML\Graphics.hpp>
 #include <time.h>
+#include <iostream>
+#include <sstream>
 #include "windows.h"
 #include <list>
 #include "plane.h"
@@ -9,7 +11,8 @@ using namespace sf;
 
 
 
-void menu(RenderWindow & window) {
+void menu(RenderWindow & app) {
+	
 	Texture menuTexture1, menuTexture2, menuTexture3, aboutTexture, menuBackground;
 	menuTexture1.loadFromFile("images/111.png");
 	menuTexture2.loadFromFile("images/222.png");
@@ -20,9 +23,39 @@ void menu(RenderWindow & window) {
 	bool isMenu = 1;
 	int menuNum = 0;
 	menu1.setPosition(100, 30);
+
 	menu2.setPosition(100, 90);
 	menu3.setPosition(100, 150);
 	menuBg.setPosition(345, 0);
+	Font font1;
+	int counting;
+	font1.loadFromFile("new-gen.ttf");
+	Text text1("hello", font1, 30);
+	text1.setFillColor(Color::Red);
+	text1.setStyle(Text::Bold);
+	std::stringstream New_Game;
+	New_Game << "New Game";
+	text1.setString(New_Game.str());
+	text1.setPosition(100, 30);
+
+	Text text2("hello", font1, 30);
+	text2.setFillColor(Color::Red);
+	text2.setStyle(Text::Bold);
+	std::stringstream About;
+	About << "About us";
+	text2.setString(About.str());
+	text2.setPosition(100, 90);
+
+	Text text3("hello", font1, 30);
+	text3.setFillColor(Color::Red);
+	text3.setStyle(Text::Bold);
+	std::stringstream Exit;
+	Exit << "Exit";
+	text3.setString(Exit.str());
+	text3.setPosition(100, 150);
+
+	menu2.setPosition(100, 90);
+	menu3.setPosition(100, 150);
 
 	//////////////////////////////МЕНЮ///////////////////
 	while (isMenu)
@@ -30,27 +63,33 @@ void menu(RenderWindow & window) {
 		menu1.setColor(Color::White);
 		menu2.setColor(Color::White);
 		menu3.setColor(Color::White);
+		if (text3.getFillColor() == Color::Blue) { text3.setFillColor(Color::Red); }
+		if (text2.getFillColor() == Color::Blue) { text2.setFillColor(Color::Red); }
+		if (text1.getFillColor() == Color::Blue) { text1.setFillColor(Color::Red); }
 		menuNum = 0;
-		window.clear(Color(129, 181, 221));
+		app.clear(Color(129, 181, 221));
 
-		if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(window))) { menu1.setColor(Color::Blue); menuNum = 1; }
-		if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(window))) { menu2.setColor(Color::Blue); menuNum = 2; }
-		if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(window))) { menu3.setColor(Color::Blue); menuNum = 3; }
-
+		if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(app))) { text1.setFillColor(Color::Blue); menuNum = 1; }
+		if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(app))) { text2.setFillColor(Color::Blue); menuNum = 2; }
+		if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(app))) { text3.setFillColor(Color::Blue); menuNum = 3; }
+		
+		
 		if (Mouse::isButtonPressed(Mouse::Left))
 		{
 			if (menuNum == 1) isMenu = false;//если нажали первую кнопку, то выходим из меню 
-			if (menuNum == 2) { window.draw(about); window.display(); while (!Keyboard::isKeyPressed(Keyboard::Escape)); }
-			if (menuNum == 3) { window.close(); isMenu = false; }
+			if (menuNum == 2) { app.draw(about); app.display(); while (!Mouse::isButtonPressed(Mouse::Right)); }
+			if (menuNum == 3) { app.close(); isMenu = false; }
 
 		}
 
-		window.draw(menuBg);
-		window.draw(menu1);
-		window.draw(menu2);
-		window.draw(menu3);
-
-		window.display();
+		app.draw(menuBg);
+		app.draw(menu1);
+		app.draw(menu2);
+		app.draw(menu3);
+		app.draw(text1);
+		app.draw(text2);
+		app.draw(text3);
+		app.display();
 	}
 }
 
@@ -81,12 +120,18 @@ bool isCollide(Entity *a, Entity *b)
 
 int main()
  {
-	RenderWindow window(sf::VideoMode(W, H), "Menu");
-	menu(window);
+	RenderWindow app(sf::VideoMode(W, H), "Menu");
+	menu(app);
 	srand(time(0));
 
-	RenderWindow app(VideoMode(W, H), "Srpska granata!");
+	//RenderWindow app(VideoMode(W, H), "Srpska granata!");
 	app.setFramerateLimit(60);
+
+	Font font;
+	font.loadFromFile("new-gen.ttf");
+	Text text("hello", font, 30);
+	text.setFillColor(Color::Red);
+	text.setStyle(Text::Bold);
 
 	Image images[8];
 	images[0].loadFromFile("images/Explodes.png");
@@ -128,7 +173,7 @@ int main()
 	Animation sPlayer(t1, 0, 0, 65, 13, 1, 0);
 	Animation sRls(t6, 0, 0, 64, 64, 16, 0);
 	std::list<Entity*> entities;
-
+	int counting = 0;
 	player *p = new player();
 	p->settings(sPlayer, 42, 413, 0, 20);
 	entities.push_back(p);
@@ -137,6 +182,10 @@ int main()
 
 	while (app.isOpen())
 	{
+		std::stringstream Schet;
+		Schet << counting;
+		text.setString("Ochki:" + Schet.str());
+		text.setPosition(100, 30);
 		Event event;
 		while (app.pollEvent(event))
 		{
@@ -175,6 +224,7 @@ int main()
 					{
 						a->life = false;
 						b->life = false;
+						counting += 150;
 						Entity *e = new Entity();
 						e->settings(sExplosion, a->x, a->y);
 						e->name = "explosion";
@@ -249,6 +299,7 @@ int main()
 
 		app.draw(background);
 		for (auto i : entities) i->draw(app);
+		app.draw(text);
 		app.display();
 	}
 
