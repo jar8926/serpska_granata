@@ -9,108 +9,6 @@
 #include "player.h"
 using namespace sf;
 
-
-
-void menu(RenderWindow & app) {
-	
-	Texture menuTexture1, menuTexture2, menuTexture3, aboutTexture, menuBackground;
-	menuTexture1.loadFromFile("images/111.png");
-	menuTexture2.loadFromFile("images/222.png");
-	menuTexture3.loadFromFile("images/333.png");
-	aboutTexture.loadFromFile("images/about.png");
-	menuBackground.loadFromFile("images/Mountains.jpg");
-	Sprite menu1(menuTexture1), menu2(menuTexture2), menu3(menuTexture3), about(aboutTexture), menuBg(menuBackground);
-	bool isMenu = 1;
-	int menuNum = 0;
-	menu1.setPosition(100, 30);
-
-	menu2.setPosition(100, 90);
-	menu3.setPosition(100, 150);
-	menuBg.setPosition(345, 0);
-	Font font1;
-	int counting;
-	font1.loadFromFile("new-gen.ttf");
-	Text text1("hello", font1, 30);
-	text1.setFillColor(Color::Red);
-	text1.setStyle(Text::Bold);
-	std::stringstream New_Game;
-	New_Game << "New Game";
-	text1.setString(New_Game.str());
-	text1.setPosition(100, 30);
-
-	Text text2("hello", font1, 30);
-	text2.setFillColor(Color::Red);
-	text2.setStyle(Text::Bold);
-	std::stringstream About;
-	About << "About us";
-	text2.setString(About.str());
-	text2.setPosition(100, 90);
-
-	Text text3("hello", font1, 30);
-	text3.setFillColor(Color::Red);
-	text3.setStyle(Text::Bold);
-	std::stringstream Exit;
-	Exit << "Exit";
-	text3.setString(Exit.str());
-	text3.setPosition(100, 150);
-
-	menu2.setPosition(100, 90);
-	menu3.setPosition(100, 150);
-
-	//////////////////////////////МЕНЮ///////////////////
-	while (isMenu)
-	{
-		menu1.setColor(Color::White);
-		menu2.setColor(Color::White);
-		menu3.setColor(Color::White);
-		if (text3.getFillColor() == Color::Blue) { text3.setFillColor(Color::Red); }
-		if (text2.getFillColor() == Color::Blue) { text2.setFillColor(Color::Red); }
-		if (text1.getFillColor() == Color::Blue) { text1.setFillColor(Color::Red); }
-		menuNum = 0;
-		app.clear(Color(129, 181, 221));
-
-		if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(app))) { text1.setFillColor(Color::Blue); menuNum = 1; }
-		if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(app))) { text2.setFillColor(Color::Blue); menuNum = 2; }
-		if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(app))) { text3.setFillColor(Color::Blue); menuNum = 3; }
-		
-		
-		if (Mouse::isButtonPressed(Mouse::Left))
-		{
-			if (menuNum == 1) isMenu = false;//если нажали первую кнопку, то выходим из меню 
-			if (menuNum == 2) { app.draw(about); app.display(); while (!Mouse::isButtonPressed(Mouse::Right)); }
-			if (menuNum == 3) { app.close(); isMenu = false; }
-
-		}
-
-		app.draw(menuBg);
-		app.draw(menu1);
-		app.draw(menu2);
-		app.draw(menu3);
-		app.draw(text1);
-		app.draw(text2);
-		app.draw(text3);
-		app.display();
-	}
-}
-
-
-/*class RLS : public plane {
-public:
-	std::string name;
-	plane Plan1;
-	RLS(plane *a) {
-		Plan1 = *a;
-		float t1, x1, t2;
-		t1 = sqrt((Plan1.x - 100)*(Plan1.x - 100) + (980 - Plan1.y)*(980 - Plan1.y)) / 0.8;
-		x1 = Plan1.x + t1 * Plan1.dx;
-		t2 = sqrt((x1 - 100)*(x1 - 100) + (980 - Plan1.y)*(980 - Plan1.y)) / 0.8;
-		x = Plan1.x + (t1+t2) * Plan1.dx;
-		y = Plan1.y;
-		name = "RLS";
-		dx = Plan1.dx;
-	}
-};*/
-
 bool isCollide(Entity *a, Entity *b)
 {
 	return (b->x - a->x)*(b->x - a->x) +
@@ -118,14 +16,11 @@ bool isCollide(Entity *a, Entity *b)
 		(a->R + b->R)*(a->R + b->R);
 }
 
-int main()
- {
-	RenderWindow app(sf::VideoMode(W, H), "Menu");
-	menu(app);
+void game(RenderWindow & window) {
 	srand(time(0));
 
 	//RenderWindow app(VideoMode(W, H), "Srpska granata!");
-	app.setFramerateLimit(60);
+	window.setFramerateLimit(60);
 
 	Font font;
 	font.loadFromFile("new-gen.ttf");
@@ -179,22 +74,21 @@ int main()
 	entities.push_back(p);
 
 	int RCount = 0;
-
-	while (app.isOpen())
+	while (window.isOpen())
 	{
 		std::stringstream Schet;
 		Schet << counting;
 		text.setString("Ochki:" + Schet.str());
 		text.setPosition(100, 30);
 		Event event;
-		while (app.pollEvent(event))
+		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
-				app.close();
+				window.close();
 
 			if (event.type == Event::KeyPressed)
 				if (event.key.code == Keyboard::Escape) {
-					app.close();
+					window.close();
 				}
 
 			if (event.type == Event::KeyPressed)
@@ -214,7 +108,7 @@ int main()
 		if (p->angle > -9) p->angle = -9;
 		if (p->angle < -90) p->angle = -90;
 		else p->thrust = false;
-		
+
 
 		for (auto a : entities)
 			for (auto b : entities)
@@ -297,11 +191,125 @@ int main()
 			else i++;
 		}
 
-		app.draw(background);
-		for (auto i : entities) i->draw(app);
-		app.draw(text);
+		window.draw(background);
+		for (auto i : entities) i->draw(window);
+		window.draw(text);
+		window.display();
+	}
+}
+
+void menu(RenderWindow & app) {
+	
+	Texture menuTexture1, menuTexture2, menuTexture3, aboutTexture, menuBackground;
+	menuTexture1.loadFromFile("images/111.png");
+	menuTexture2.loadFromFile("images/222.png");
+	menuTexture3.loadFromFile("images/333.png");
+	aboutTexture.loadFromFile("images/about.png");
+	menuBackground.loadFromFile("images/Mountains.jpg");
+	Sprite menu1(menuTexture1), menu2(menuTexture2), menu3(menuTexture3), about(aboutTexture), menuBg(menuBackground);
+	bool isMenu = 1;
+	int menuNum = 0;
+	menu1.setPosition(100, 30);
+
+	menu2.setPosition(100, 90);
+	menu3.setPosition(100, 150);
+	menuBg.setPosition(345, 0);
+	Font font1;
+	int counting;
+	font1.loadFromFile("new-gen.ttf");
+	Text text1("hello", font1, 30);
+	text1.setFillColor(Color::Red);
+	text1.setStyle(Text::Bold);
+	std::stringstream New_Game;
+	New_Game << "New Game";
+	text1.setString(New_Game.str());
+	text1.setPosition(100, 30);
+
+	Text text2("hello", font1, 30);
+	text2.setFillColor(Color::Red);
+	text2.setStyle(Text::Bold);
+	std::stringstream About;
+	About << "About us";
+	text2.setString(About.str());
+	text2.setPosition(100, 90);
+
+	Text text3("hello", font1, 30);
+	text3.setFillColor(Color::Red);
+	text3.setStyle(Text::Bold);
+	std::stringstream Exit;
+	Exit << "Exit";
+	text3.setString(Exit.str());
+	text3.setPosition(100, 150);
+
+	menu2.setPosition(100, 90);
+	menu3.setPosition(100, 150);
+
+	//////////////////////////////МЕНЮ///////////////////
+	while (isMenu)
+	{
+		menu1.setColor(Color::White);
+		menu2.setColor(Color::White);
+		menu3.setColor(Color::White);
+		if (text3.getFillColor() == Color::Blue) { text3.setFillColor(Color::Red); }
+		if (text2.getFillColor() == Color::Blue) { text2.setFillColor(Color::Red); }
+		if (text1.getFillColor() == Color::Blue) { text1.setFillColor(Color::Red); }
+		menuNum = 0;
+		app.clear(Color(129, 181, 221));
+
+		if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(app))) { text1.setFillColor(Color::Blue); menuNum = 1; }
+		if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(app))) { text2.setFillColor(Color::Blue); menuNum = 2; }
+		if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(app))) { text3.setFillColor(Color::Blue); menuNum = 3; }
+		
+		
+		if (Mouse::isButtonPressed(Mouse::Left))
+		{
+			if (menuNum == 1) {
+				RenderWindow window(sf::VideoMode(W, H), "Menu");
+				game(window);
+			}//если нажали первую кнопку, то выходим из меню 
+			if (menuNum == 2) { app.draw(about); app.display(); while (!Mouse::isButtonPressed(Mouse::Right)); }
+			if (menuNum == 3) { app.close(); isMenu = false; }
+
+		}
+
+		app.draw(menuBg);
+		app.draw(menu1);
+		app.draw(menu2);
+		app.draw(menu3);
+		app.draw(text1);
+		app.draw(text2);
+		app.draw(text3);
 		app.display();
 	}
+}
 
+
+/*class RLS : public plane {
+public:
+	std::string name;
+	plane Plan1;
+	RLS(plane *a) {
+		Plan1 = *a;
+		float t1, x1, t2;
+		t1 = sqrt((Plan1.x - 100)*(Plan1.x - 100) + (980 - Plan1.y)*(980 - Plan1.y)) / 0.8;
+		x1 = Plan1.x + t1 * Plan1.dx;
+		t2 = sqrt((x1 - 100)*(x1 - 100) + (980 - Plan1.y)*(980 - Plan1.y)) / 0.8;
+		x = Plan1.x + (t1+t2) * Plan1.dx;
+		y = Plan1.y;
+		name = "RLS";
+		dx = Plan1.dx;
+	}
+};*/
+
+
+
+int main()
+ {
+	RenderWindow app(sf::VideoMode(W, H), "Menu");
+	menu(app);
+	
+
+	
+	
 	return 0;
 }
