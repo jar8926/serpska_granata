@@ -134,7 +134,6 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="Highcore.cpp" />
     <ClCompile Include="Main.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\progi\proekt\SFML-Test\SFML-Test\SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -145,7 +144,6 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="Highcore.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="rocket.h" />
