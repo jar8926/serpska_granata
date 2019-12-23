@@ -1,6 +1,7 @@
 #include <SFML\Graphics.hpp>
 #include <time.h>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include "windows.h"
 #include <list>
@@ -68,7 +69,7 @@ void game(RenderWindow & window) {
 	Animation sPlayer(t1, 0, 0, 65, 13, 1, 0);
 	Animation sRls(t6, 0, 0, 64, 64, 16, 0);
 	std::list<Entity*> entities;
-	int counting = 0;
+	int score = 0;
 	player *p = new player();
 	p->settings(sPlayer, 42, 413, 0, 20);
 	entities.push_back(p);
@@ -77,8 +78,8 @@ void game(RenderWindow & window) {
 	while (window.isOpen())
 	{
 		std::stringstream Schet;
-		Schet << counting;
-		text.setString("Ochki:" + Schet.str());
+		Schet << score;
+		text.setString("Score:" + Schet.str());
 		text.setPosition(100, 30);
 		Event event;
 		while (window.pollEvent(event))
@@ -118,7 +119,7 @@ void game(RenderWindow & window) {
 					{
 						a->life = false;
 						b->life = false;
-						counting += 150;
+						score += 150;
 						Entity *e = new Entity();
 						e->settings(sExplosion, a->x, a->y);
 						e->name = "explosion";
@@ -196,7 +197,125 @@ void game(RenderWindow & window) {
 		window.draw(text);
 		window.display();
 	}
+	std::ofstream writeFile("Score.txt");
+	if (writeFile.is_open()) {
+		writeFile << score;
+	}
+	writeFile.close();
 }
+
+
+void highscore(RenderWindow & window) {
+
+	Texture menuTexture1, menuTexture2, menuTexture3, aboutTexture, menuBackground;
+	menuTexture1.loadFromFile("images/111.png");
+	menuTexture2.loadFromFile("images/222.png");
+	menuTexture3.loadFromFile("images/333.png");
+	aboutTexture.loadFromFile("images/about.png");
+	Sprite menu1(menuTexture1), menu2(menuTexture2), menu3(menuTexture3), about(aboutTexture);
+	bool isMenu = 1;
+	int menuNum = 0;
+	menu1.setPosition(100, 600);
+
+	menu2.setPosition(200, 600);
+	Font font1;
+	int counting;
+	font1.loadFromFile("new-gen.ttf");
+	Text text1("hello", font1, 30);
+	text1.setFillColor(Color::Red);
+	text1.setStyle(Text::Bold);
+	std::stringstream New_Game;
+	New_Game << "New Game";
+	text1.setString(New_Game.str());
+	text1.setPosition(30, 400);
+
+	Text text2("hello", font1, 30);
+	text2.setFillColor(Color::Red);
+	text2.setStyle(Text::Bold);
+	std::stringstream Exit;
+	Exit << "Return to menu";
+	text2.setString(Exit.str());
+	text2.setPosition(300, 400);
+	int _score;
+	std::ifstream readFile;
+	readFile.open("Score.txt");
+	if (readFile.is_open()) {
+		while (!readFile.eof()) {
+			readFile >> _score;
+		}
+	}
+	readFile.close();
+	int _highscore;
+	readFile.open("Highscore.txt");
+		if (readFile.is_open()) {
+			while (!readFile.eof()) {
+				readFile >> _highscore;
+			}
+	}
+		readFile.close();
+		std::ofstream writeFile("Highscore.txt");
+		if (writeFile.is_open()) {
+			if (_score > _highscore) {
+				_highscore = _score;
+			}
+			writeFile << _highscore;
+		}
+		writeFile.close();
+	Text text3("hello", font1, 30);
+	text3.setFillColor(Color::Red);
+	text3.setStyle(Text::Bold);
+	std::stringstream Highscore;
+	Highscore << "Highscore : " << _highscore;
+	text3.setString(Highscore.str());
+	text3.setPosition(30, 30);
+
+	Text text4("hello", font1, 30);
+	text4.setFillColor(Color::Red);
+	text4.setStyle(Text::Bold);
+	std::stringstream Score;
+	Score << "Score : "<<_score;
+	text4.setString(Score.str());
+	text4.setPosition(30, 90);
+
+
+	//////////////////////////////МЕНЮ///////////////////
+	while (isMenu)
+	{
+		menu1.setColor(Color::White);
+		menu2.setColor(Color::White);
+		menu3.setColor(Color::White);
+		if (text3.getFillColor() == Color::Blue) { text3.setFillColor(Color::Red); }
+		if (text2.getFillColor() == Color::Blue) { text2.setFillColor(Color::Red); }
+		if (text1.getFillColor() == Color::Blue) { text1.setFillColor(Color::Red); }
+		menuNum = 0;
+		window.clear(Color(129, 181, 221));
+
+		if (IntRect(30, 400, 200, 400).contains(Mouse::getPosition(window))) { text1.setFillColor(Color::Blue); menuNum = 1; }
+		if (IntRect(301, 400, 400, 400).contains(Mouse::getPosition(window))) { text2.setFillColor(Color::Blue); menuNum = 2; }
+
+
+		if (Mouse::isButtonPressed(Mouse::Left))
+		{
+			if (menuNum == 1) {
+				RenderWindow window(sf::VideoMode(W, H), "Menu");
+				game(window);
+				window.close(); 
+				isMenu = false;
+			}//если нажали первую кнопку, то выходим из меню 
+			if (menuNum == 2) { window.close(); isMenu = false; }
+
+		}
+
+		window.draw(menu1);
+		window.draw(menu2);
+		window.draw(text1);
+		window.draw(text2);
+		window.draw(text3);
+		window.draw(text4);
+		window.display();
+	}
+}
+
 
 void menu(RenderWindow & app) {
 	
@@ -264,8 +383,10 @@ void menu(RenderWindow & app) {
 		if (Mouse::isButtonPressed(Mouse::Left))
 		{
 			if (menuNum == 1) {
-				RenderWindow window(sf::VideoMode(W, H), "Menu");
+				RenderWindow window(sf::VideoMode(W, H), "Srpska granata");
 				game(window);
+				RenderWindow window1(sf::VideoMode(W, H), "Score");
+				highscore(window1);
 			}//если нажали первую кнопку, то выходим из меню 
 			if (menuNum == 2) { app.draw(about); app.display(); while (!Mouse::isButtonPressed(Mouse::Right)); }
 			if (menuNum == 3) { app.close(); isMenu = false; }
